@@ -447,4 +447,7 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 
+# Milky
 appsettings.json
+NonRelevant
+client
