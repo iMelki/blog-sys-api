@@ -10,9 +10,9 @@ namespace API.Entities
         public string UserName { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
-        public ICollection<AppPost> Posts { get; set; }
-        public ICollection<Like> LikedPosts { get; set; }
-        public ICollection<Follow> FollowedByUsers { get; set; }
-        public ICollection<Follow> FollowsUsers { get; set; }
+        public IEnumerable<AppPost> Posts { get; set; }
+        public IEnumerable<Like> LikedPosts { get; set; }
+        public IEnumerable<Follow> FollowedByUsers { get; set; }
+        public IEnumerable<Follow> FollowsUsers { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using API.Data;
 using API.Data.Repositories;
+using API.Helpers;
 using API.Interfaces;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -31,8 +32,10 @@ namespace API.Extensions
             connectionString = connectionString!=null ? connectionString : Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"); 
             Console.WriteLine("connectionString: " + connectionString);
             
-            services.AddScoped<ILikesRepository, LikesRepository>();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<ILikesRepository, LikesRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             services.AddDbContext<DataContext>(options =>
             {
                 //options.UseSqlite("Connection String");

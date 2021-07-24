@@ -30,7 +30,7 @@ namespace API.Data.Repositories
             */
             return null;
         }
-        public Task<IEnumerable<PostLikesDto>> GetUsersLikesByPostId(int postId)
+        public async Task<IEnumerable<PostLikesDto>> GetUsersLikesByPostId(int postId)
         {
             return null;
         }
