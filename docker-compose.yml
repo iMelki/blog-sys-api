@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: admin
       # POSTGRES_URL: postgres://admin:password@localhost:5432/blogdb
       POSTGRES_DB: blogdb
-      # POSTGRES_HOST: postgres
+      POSTGRES_HOST: postgres_image
     ports:
       - "5432:5432"
 
@@ -40,8 +40,11 @@ services:
     working_dir: /source/API/
     ports:
       - "5001:5001"
+      - "5000:5000"
     environment:
-      #ANDREI_CONNECTION_STRING: "postgres://admin:password@postgres:5432/blogdb"
+      MY_PG_CS: "User ID=admin;Username=admin;Password=admin;Host=localhost;Port=5432;Database=blogdb;"
+      ANDREI_CONNECTION_STRING: "postgres://admin:admin@postgres_image:5432/blogdb"
       #DB_CONNECTION_STRING: "host=postgres_image;port=5432;database=blogdb;username=admin;password=password"
       DB_CONNECTION_STRING: "host=postgres_image;port=5432;database=blogdb;username=admin;password=admin"
+      POSTGRES_HOST: postgres_image
     #   REDIS_URI: redis://redis:6379

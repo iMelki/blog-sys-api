@@ -4,11 +4,10 @@ namespace API.Entities
 {
     public class Follow
     {
-        public int Id { get; set; }
-        public DateTime Time { get; set; }
+        public DateTime Time { get; set; } = DateTime.Now;
         public int FollowerUserId { get; set; }
-        public AppUser FollowerAppUser { get; set; }
+        public AppUser FollowerUser { get; set; }
         public int FollowedUserId { get; set; }
-        public AppUser FollowedAppUser { get; set; }
+        public AppUser FollowedUser { get; set; }
     }
 }
