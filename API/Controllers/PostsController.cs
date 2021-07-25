@@ -32,9 +32,10 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppPost>>> GetAllPosts()
+        public async Task<ActionResult<ICollection<AppPost>>> GetAllPosts()
         {
-            return await _context.Posts.ToListAsync();
+            var posts = await _postRepository.GetAllPosts();
+            return Ok(posts);
         }
 
         //api/posts/3
@@ -47,14 +48,13 @@ namespace API.Controllers
             return Ok(posts);
         }
 
-
         [Authorize]
         [HttpPost("add")]
         public async Task<ActionResult<PostDto>> AddPost(PostDto postDto)
         {
             //var userId = (User.Identity.Name);
             //Console.WriteLine("User.GetUsername() = " + User.GetUsername());
-            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+            var user = await _userRepository.GetUserWithPostsByUsernameAsync(User.GetUsername());
             Console.WriteLine("user = " + user.ToString());
             var userId = user.Id;
             Console.WriteLine("ID = " + userId);
@@ -66,15 +66,24 @@ namespace API.Controllers
             };
 
             Console.WriteLine(post.Title + "!!!!!!!!!!!!!!");
-            _context.Posts.Add(post);
-            await _context.SaveChangesAsync();
+            PostDto postDetails = await _postRepository.AddPost(post);
+            return postDetails;
 
-            return new PostDto
-            {
-                Title = post.Title,
-                Content = post.Content
-            };
+        }
 
+        //[Route("remove/:postId")]
+        [Authorize]
+        [HttpDelete("remove/{postId}")]
+        public async Task<ActionResult<PostDto>> RemovePost(int postId)
+        {
+            var user = await _userRepository.GetUserWithPostsByUsernameAsync(User.GetUsername());
+            var userId = user.Id;
+            
+            AppPost post = await _postRepository.GetPostById(postId);
+            if(userId != post.UserId) return Unauthorized("Not Your Post");
+            
+            PostDto postDetails = _postRepository.RemovePost(post);
+            return postDetails;
         }
 
         private async Task<bool> isPostExists(string username)

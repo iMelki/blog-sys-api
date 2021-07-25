@@ -34,40 +34,56 @@ namespace API.Controllers
             _likesRepository = likesRepository;
         }
 
-    [Authorize]
-    [HttpPost("{postId}")]
-    public async Task<ActionResult> AddLike(int postId)
-    {
-        Console.WriteLine("username = " + User.GetUsername());
-        var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-        var sourceUserId = user.Id;
-        AppPost post = await _postRepository.GetPostById(postId);
-
-        if (post == null) return NotFound();
-
-        Like like = await _likesRepository.GetPostLike(sourceUserId, postId);
-
-        if (like != null)
+        [Authorize]
+        [HttpPost("{postId}")]
+        public async Task<ActionResult> AddLike(int postId)
         {
-            //TODO: implement DISLIKE 
-            return BadRequest("Already liked this post");
+            Console.WriteLine("username = " + User.GetUsername());
+            var user = await _userRepository.GetUserWithPostsByUsernameAsync(User.GetUsername());
+            var sourceUserId = user.Id;
+            AppPost post = await _postRepository.GetPostById(postId);
+
+            if (post == null) return NotFound();
+
+            Like like = await _likesRepository.GetPostLike(sourceUserId, postId);
+
+            if (like != null)
+            {
+                //TODO: implement DISLIKE 
+                return BadRequest("Already liked this post");
+            }
+
+            like = new Like{
+                LikedPostId = postId,
+                LikesUserId = sourceUserId
+            };
+
+            if (post.LikedByUsers == null) post.LikedByUsers = new List<Like>();
+            post.LikedByUsers.Add(like);
+            if (user.LikedPosts == null) user.LikedPosts = new List<Like>();
+            user.LikedPosts.Add(like);
+
+            if(await _userRepository.SaveAllAsync()) return Ok();
+
+            return BadRequest("Failed to like the post");
         }
 
-        like = new Like{
-            LikedPostId = postId,
-            LikesUserId = sourceUserId
-        };
+    
 
-        if (post.LikedByUsers == null) post.LikedByUsers = new List<Like>();
-        post.LikedByUsers.Add(like);
-        if (user.LikedPosts == null) user.LikedPosts = new List<Like>();
-        user.LikedPosts.Add(like);
-
-        if(await _userRepository.SaveAllAsync()) return Ok();
-
-        return BadRequest("Failed to like the post");
-    }
-
+        //[Route(":postId")]
+        [Authorize]
+        [HttpDelete("{postId}")]
+        public async Task<ActionResult<Boolean>> RemoveLikeByPostId(int postId)
+        {
+            var user = await _userRepository.GetUserWithPostsByUsernameAsync(User.GetUsername());
+            var userId = user.Id;
+            
+            Like like = await _likesRepository.GetPostLike(userId, postId);
+            if(like == null) return BadRequest("You don't like this post");
+            
+            Boolean isRemoved = _likesRepository.RemoveLike(like);
+            return isRemoved;
+        }
     //api/posts/3
     //[Authorize]
     [Authorize]
@@ -82,34 +98,5 @@ namespace API.Controllers
         };*/
         return Ok(postsToReturn);
     }
-
-    /*
-            [AllowAnonymous]
-            [HttpPost("add")]
-            public async Task<ActionResult<PostDto>> AddPost(PostDto postDto)
-            {
-                var post = new AppPost
-                {
-                    Title = postDto.Title,
-                    Content = postDto.Content
-                };
-
-                Console.WriteLine(post.Title + "!!!!!!!!!!!!!!");
-                _context.Posts.Add(post);
-                await _context.SaveChangesAsync();
-
-                return new PostDto
-                {
-                    Title = post.Title,
-                    Content = post.Content
-                };
-
-            }
-
-            private async Task<bool> isPostExists(string username)
-            {
-                return await _context.Users.AnyAsync(x => x.UserName.Equals(username.ToLower()));
-            }
-            */
 }
 }

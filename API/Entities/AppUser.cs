@@ -12,7 +12,7 @@ namespace API.Entities
         public byte[] PasswordSalt { get; set; }
         public IEnumerable<AppPost> Posts { get; set; }
         public ICollection<Like> LikedPosts { get; set; }
-        public IEnumerable<Follow> FollowedByUsers { get; set; }
-        public IEnumerable<Follow> FollowsUsers { get; set; }
+        public ICollection<Follow> FollowedByUsers { get; set; }
+        public ICollection<Follow> FollowsUsers { get; set; }
     }
 }

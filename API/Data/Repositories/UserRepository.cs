@@ -37,7 +37,7 @@ namespace API.Data.Repositories
             return await _context.Users
                 .FindAsync(id); 
         }
-        public async Task<AppUser> GetUserByUsernameAsync(string username)
+        public async Task<AppUser> GetUserWithPostsByUsernameAsync(string username)
         {
             return await _context.Users
                 .Include(u => u.Posts)

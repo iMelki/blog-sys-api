@@ -40,5 +40,23 @@ namespace API.Data.Repositories
         {
             throw new NotImplementedException();
         }
+
+        public async Task<AppUser> GetUserWithLikes(int userId)
+        {
+            return await _context.Users
+                        .Include(u => u.LikedPosts)
+                        .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
+        public bool RemoveLike(Like like)
+        {
+            try{
+                _context.Likes.Remove(like);                
+                _context.SaveChanges();
+                return true;
+            }catch{
+                return false;
+            }
+        }
     }
 }
