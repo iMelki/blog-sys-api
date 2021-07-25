@@ -20,9 +20,13 @@ namespace API.Controllers
     {
         private readonly DataContext _context;
         private readonly IUserRepository _userRepository;
-        public PostsController(DataContext context, IUserRepository userRepository)
+        private readonly IPostRepository _postRepository;
+        public PostsController(DataContext context
+                            , IUserRepository userRepository
+                            , IPostRepository postRepository)
         {
             _userRepository = userRepository;
+            _postRepository = postRepository;
             _context = context;
         }
 
@@ -36,10 +40,11 @@ namespace API.Controllers
         //api/posts/3
         //[Authorize]
         [AllowAnonymous]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<AppPost>>> GetPostsByUserId(int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<ICollection<AppPost>>> GetPostsByUserId(int userId)
         {
-            return await _context.Posts.Where(post => post.UserId == id).ToListAsync();
+            var posts = await _postRepository.GetPostsByUserId(userId);
+            return Ok(posts);
         }
 
 

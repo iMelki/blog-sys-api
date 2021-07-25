@@ -29,6 +29,7 @@ namespace API.Extensions
             Console.WriteLine("connectionString: " + connectionString);
             */
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ILikesRepository, LikesRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
