@@ -3,36 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Data;
+using API.Data.Repositories;
 using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Identity;
-using API.Interfaces;
-using API.Extensions;
 
 namespace API.Controllers
 {
     [Authorize]
-    public class PostsController : BaseApiController
+    public class LikesController : BaseApiController
     {
-        private readonly DataContext _context;
-        private readonly IUserRepository _userRepository;
-        public PostsController(DataContext context, IUserRepository userRepository)
+        private readonly LikesRepository _likesRepository;
+        private readonly UserRepository _userRepository;
+        public LikesController(LikesRepository likesRepository, UserRepository userRepository)
         {
             _userRepository = userRepository;
-            _context = context;
+            _likesRepository = likesRepository;
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppPost>>> GetAllPosts()
+        [HttpPost("{username}")]
+        public async Task<ActionResult> AddLike(string username)
         {
-            return await _context.Posts.ToListAsync();
-        }
+            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+            var sourceUserId = user.Id;
+            return null;
 
+        }
+/*
         //api/posts/3
         //[Authorize]
         [AllowAnonymous]
@@ -43,19 +45,12 @@ namespace API.Controllers
         }
 
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("add")]
         public async Task<ActionResult<PostDto>> AddPost(PostDto postDto)
         {
-            //var userId = (User.Identity.Name);
-            //Console.WriteLine("User.GetUsername() = " + User.GetUsername());
-            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
-            Console.WriteLine("user = " + user.ToString());
-            var userId = user.Id;
-            Console.WriteLine("ID = " + userId);
             var post = new AppPost
             {
-                UserId = userId,
                 Title = postDto.Title,
                 Content = postDto.Content
             };
@@ -76,5 +71,6 @@ namespace API.Controllers
         {
             return await _context.Users.AnyAsync(x => x.UserName.Equals(username.ToLower()));
         }
+        */
     }
 }
