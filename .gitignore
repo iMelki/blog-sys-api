@@ -450,5 +450,10 @@ $RECYCLE.BIN/
 # Milky
 appsettings.json
 NonRelevant
-client
+#client
 Entitiezzzz
+docker-compose Gandalf 2.yml
+docker-compose Gandalf.yml
+docker-compose Milky.yml
+docker-compose Yoni.yml
+README-docker.md

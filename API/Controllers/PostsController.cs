@@ -20,28 +20,43 @@ namespace API.Controllers
     {
         private readonly DataContext _context;
         private readonly IUserRepository _userRepository;
-        public PostsController(DataContext context, IUserRepository userRepository)
+        private readonly IPostRepository _postRepository;
+        public PostsController(DataContext context
+                            , IUserRepository userRepository
+                            , IPostRepository postRepository)
         {
             _userRepository = userRepository;
+            _postRepository = postRepository;
             _context = context;
         }
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppPost>>> GetAllPosts()
+        public async Task<ActionResult<ICollection<AppPost>>> GetAllPosts()
         {
-            return await _context.Posts.ToListAsync();
+            var posts = await _postRepository.GetAllPosts();
+            return Ok(posts);
         }
 
         //api/posts/3
         //[Authorize]
         [AllowAnonymous]
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<AppPost>>> GetPostsByUserId(int id)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<ICollection<AppPost>>> GetPostsByUserId(int userId)
         {
-            return await _context.Posts.Where(post => post.UserId == id).ToListAsync();
+            var posts = await _postRepository.GetPostsByUserId(userId);
+            return Ok(posts);
         }
 
+        //api/posts/avi
+        //[Authorize]
+        [AllowAnonymous]
+        [HttpGet("{username}")]
+        public async Task<ActionResult<ICollection<AppPost>>> GetPostsByUsername(string username)
+        {
+            var posts = await _postRepository.GetPostsByUsername(username);
+            return Ok(posts);
+        }
 
         [Authorize]
         [HttpPost("add")]
@@ -49,7 +64,7 @@ namespace API.Controllers
         {
             //var userId = (User.Identity.Name);
             //Console.WriteLine("User.GetUsername() = " + User.GetUsername());
-            var user = await _userRepository.GetUserByUsernameAsync(User.GetUsername());
+            var user = await _userRepository.GetUserWithPostsByUsernameAsync(User.GetUsername());
             Console.WriteLine("user = " + user.ToString());
             var userId = user.Id;
             Console.WriteLine("ID = " + userId);
@@ -61,15 +76,24 @@ namespace API.Controllers
             };
 
             Console.WriteLine(post.Title + "!!!!!!!!!!!!!!");
-            _context.Posts.Add(post);
-            await _context.SaveChangesAsync();
+            PostDto postDetails = await _postRepository.AddPost(post);
+            return postDetails;
 
-            return new PostDto
-            {
-                Title = post.Title,
-                Content = post.Content
-            };
+        }
 
+        //[Route("remove/:postId")]
+        [Authorize]
+        [HttpDelete("remove/{postId}")]
+        public async Task<ActionResult<PostDto>> RemovePost(int postId)
+        {
+            var user = await _userRepository.GetUserWithPostsByUsernameAsync(User.GetUsername());
+            var userId = user.Id;
+            
+            AppPost post = await _postRepository.GetPostById(postId);
+            if(userId != post.UserId) return Unauthorized("Not Your Post");
+            
+            PostDto postDetails = _postRepository.RemovePost(post);
+            return postDetails;
         }
 
         private async Task<bool> isPostExists(string username)

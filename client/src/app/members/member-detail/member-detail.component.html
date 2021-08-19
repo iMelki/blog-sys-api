@@ -1,0 +1,21 @@
+<div class="row">
+    <div class="col-4">
+        <div class="card">
+            <div class="card-body">
+                {{member.username}}
+                <div class="mb-2" *ngIf="(presence.onlineUsers$ | async).includes(member.username)" >
+                    <i class="fa fa-user-circle text-success"></i> Online now
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="btn-group d-flex">
+                    <button class="btn btn-primary">Like</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-8">
+        <app-member-messages [username]="member.username"></app-member-messages>
+    </div>
+</div>

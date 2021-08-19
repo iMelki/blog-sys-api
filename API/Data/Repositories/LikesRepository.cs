@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
+using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Data.Repositories
 {
@@ -16,25 +18,45 @@ namespace API.Data.Repositories
         {
             _context = context;
         }
-        
-        public async Task<IEnumerable<UserPostLikesDto>> GetPostsLikedByUserId(int userId)
+
+        public async Task<Like> GetPostLike(int userId, int postId)
         {
-            /*
-            var posts = _context.Posts.OrderBy().AsQu
-            List<TaskItem> items = await _context.Where(item => (!(item.IsCompleted))).ToListAsync();
-            List<ItemDto> itemDtos = new List<ItemDto>();
-            items.ForEach(item => itemDtos.Add(new ItemDto {Id = item.Id, Caption = item.Caption }));
-            return itemDtos;
-            await _context.Likes
-                .Include()
-            */
-            return null;
-        }
-        public async Task<IEnumerable<PostLikesDto>> GetUsersLikesByPostId(int postId)
-        {
-            return null;
+            return await _context.Likes.FindAsync(userId, postId);
         }
 
-        
+        public async Task<IEnumerable<AppPost>> GetPostsLikedByUserId(int userId)
+        {
+            IEnumerable<Like> likesWithPost = await _context.Likes
+                .Where(x => x.LikesUserId == userId)
+                .Include(x => x.LikedPost).ToListAsync();
+            if (likesWithPost.Count() < 1) return null;
+            IEnumerable<AppPost> posts = likesWithPost.Select(l => l.LikedPost);
+            return posts;
+            //      .Include(user => user.LikedPosts)
+            //        .FirstOrDefaultAsync(user => user.Id == userId);
+        }
+
+        public Task<IEnumerable<PostLikesDto>> GetUsersLikesByPostId(int postId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<AppUser> GetUserWithLikes(int userId)
+        {
+            return await _context.Users
+                        .Include(u => u.LikedPosts)
+                        .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+
+        public bool RemoveLike(Like like)
+        {
+            try{
+                _context.Likes.Remove(like);                
+                _context.SaveChanges();
+                return true;
+            }catch{
+                return false;
+            }
+        }
     }
 }

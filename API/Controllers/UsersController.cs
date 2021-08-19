@@ -39,7 +39,7 @@ namespace API.Controllers
         public async Task<ActionResult<AppUser>> GetUser(string username)
         {
             Console.WriteLine("UserName = " + username);
-            var user = await _userRepository.GetUserByUsernameAsync(username);
+            var user = await _userRepository.GetUserWithPostsByUsernameAsync(username);
             var userToReturn = _mapper.Map<MemberDto>(user);
             return Ok(userToReturn);
         }

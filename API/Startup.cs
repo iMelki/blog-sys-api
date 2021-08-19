@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using API.Data;
-using API.Extensions;
-using API.Interfaces;
-using API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,6 +15,12 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+/////////////////// APP Files:
+using API.Data;
+using API.Extensions;
+using API.Interfaces;
+using API.Services;
+using API.Hubs;
 
 namespace API
 {
@@ -40,6 +42,7 @@ namespace API
             services.AddApplicationServices(_config);
             
             services.AddControllers();
+            services.AddSignalR();
             services.AddCors();
 
             services.AddSwaggerGen(c =>
@@ -49,6 +52,7 @@ namespace API
             
             //Extension method:
             services.AddIdentityServices(_config);
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,7 +69,11 @@ namespace API
 
             app.UseRouting();
             app.UseCors(policy => {
-                policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();//WithOrigins("http://localhost:4200", "https://localhost:4200");
+                policy.AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                //.AllowAnyOrigin();
+                .WithOrigins("http://localhost:4200", "https://localhost:4200");
             });
 
             app.UseAuthentication();
@@ -74,6 +82,8 @@ namespace API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<PresenceHub>("hubs/presence");
+                endpoints.MapHub<MessageHub>("hubs/message");
             });
         }
     }

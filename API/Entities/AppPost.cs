@@ -11,7 +11,7 @@ namespace API.Entities
 
         public int UserId { get; set; }
         public AppUser AppUser { get; set; }
-        public IEnumerable<Like> LikedByUsers { get; set; }
+        public ICollection<Like> LikedByUsers { get; set; }
         public DateTime TimePosted { get; set; } = DateTime.Now;
     }
 }
