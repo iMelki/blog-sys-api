@@ -60,6 +60,11 @@ namespace API.Data.Repositories
             return await _context.Posts.Where(post => post.UserId == userId).ToListAsync();
         }
 
+        public async Task<ICollection<AppPost>> GetPostsByUsername(string username)
+        {
+            return await _context.Posts.Include(p => p.AppUser).Where(post => post.AppUser.UserName == username).ToListAsync();
+        }
+
         public async Task<IEnumerable<AppPost>> GetPostsLikedByUserId(int userId)
         {
             IEnumerable<Like> likesWithPost = await _context.Likes

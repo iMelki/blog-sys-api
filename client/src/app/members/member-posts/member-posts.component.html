@@ -1,0 +1,24 @@
+<div class="card">
+    <div class="card-body">
+        <div *ngIf="posts.length === 0">
+            No posts yet... 
+        </div>
+        
+        <ul *ngIf="posts.length > 0" class="chat">
+            <li *ngFor="let post of posts" class="row-2">
+                <div>
+                    {{post.title}}
+                    <div class="chat-body">
+                        <div class="header">
+                            <small class="text-muted">
+                                <span class="fa fa-clock-o">{{post.timePosted | timeago}}</span>
+                            </small>
+                        </div>
+                        <p>{{post.content}}</p>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+</div>

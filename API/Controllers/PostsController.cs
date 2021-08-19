@@ -48,6 +48,16 @@ namespace API.Controllers
             return Ok(posts);
         }
 
+        //api/posts/avi
+        //[Authorize]
+        [AllowAnonymous]
+        [HttpGet("{username}")]
+        public async Task<ActionResult<ICollection<AppPost>>> GetPostsByUsername(string username)
+        {
+            var posts = await _postRepository.GetPostsByUsername(username);
+            return Ok(posts);
+        }
+
         [Authorize]
         [HttpPost("add")]
         public async Task<ActionResult<PostDto>> AddPost(PostDto postDto)

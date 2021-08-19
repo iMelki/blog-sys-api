@@ -1,6 +1,7 @@
 using API.Entities;
 using API.DTOs;
 using AutoMapper;
+using System;
 
 namespace API.Helpers
 {
@@ -10,6 +11,8 @@ namespace API.Helpers
         {
             CreateMap<AppUser, MemberDto>();
             CreateMap<AppPost, PostDto>();
+            CreateMap<Message, MessageDto>();
+            CreateMap<DateTime, DateTime>().ConvertUsing(d => DateTime.SpecifyKind(d, DateTimeKind.Utc));
         }
     }
 }

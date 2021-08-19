@@ -2,6 +2,7 @@ using System;
 using API.Data;
 using API.Data.Repositories;
 using API.Helpers;
+using API.Hubs;
 using API.Interfaces;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -28,9 +29,11 @@ namespace API.Extensions
             connectionString = connectionString!=null ? connectionString : config.GetConnectionString("PostgresDefaultConnection"); 
             Console.WriteLine("connectionString: " + connectionString);
             */
+            services.AddSingleton<PresenceTracker>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ILikesRepository, LikesRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<IFollowRepository, FollowRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
@@ -57,10 +60,11 @@ namespace API.Extensions
                 if (env == "Development")
                 {
                     // Use Sqlite onnection string from file.
-                    //connectionString = config.GetConnectionString("SqliteDefaultConnection");
-                    //options.UseSqlite(config.GetConnectionString(connectionString));
+                    connectionString = config.GetConnectionString("SqliteDefaultConnection");
+                    options.UseSqlite(connectionString);
+
                     //Use PG:
-                    connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+                    //connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
                 }
                 else
                 {
@@ -84,7 +88,7 @@ namespace API.Extensions
 
                 // Whether the connection string came from the local development configuration file
                 // or from the environment variable from Heroku, use it to set up your DbContext.
-                options.UseNpgsql(connectionString);
+                //options.UseNpgsql(connectionString);
             });
 
             return services;

@@ -14,6 +14,7 @@ namespace API.Interfaces
         Task<PostDto> AddPost(AppPost post);
         PostDto RemovePost(AppPost post);
         Task<ICollection<AppPost>> GetPostsByUserId(int userId);
+        Task<ICollection<AppPost>> GetPostsByUsername(string username);
         //Task<IEnumerable<PostLikesDto>> GetUsersLikesByPostId(int postId);
     }
 }

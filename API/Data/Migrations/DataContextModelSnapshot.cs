@@ -67,6 +67,24 @@ namespace API.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("API.Entities.Connection", b =>
+                {
+                    b.Property<string>("ConnectionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GroupName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("ConnectionId");
+
+                    b.HasIndex("GroupName");
+
+                    b.ToTable("Connections");
+                });
+
             modelBuilder.Entity("API.Entities.Follow", b =>
                 {
                     b.Property<int>("FollowerUserId")
@@ -83,6 +101,16 @@ namespace API.Data.Migrations
                     b.HasIndex("FollowedUserId");
 
                     b.ToTable("Follows");
+                });
+
+            modelBuilder.Entity("API.Entities.Group", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Groups");
                 });
 
             modelBuilder.Entity("API.Entities.Like", b =>
@@ -103,6 +131,48 @@ namespace API.Data.Migrations
                     b.ToTable("Likes");
                 });
 
+            modelBuilder.Entity("API.Entities.Message", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DateRead")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("RecipientDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RecipientUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RecipientUserName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("SenderDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SenderUserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SenderUserName")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("TimePosted")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientUserId");
+
+                    b.HasIndex("SenderUserId");
+
+                    b.ToTable("PrivateMessages");
+                });
+
             modelBuilder.Entity("API.Entities.AppPost", b =>
                 {
                     b.HasOne("API.Entities.AppUser", "AppUser")
@@ -110,6 +180,14 @@ namespace API.Data.Migrations
                         .HasForeignKey("AppUserId");
 
                     b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("API.Entities.Connection", b =>
+                {
+                    b.HasOne("API.Entities.Group", null)
+                        .WithMany("Connections")
+                        .HasForeignKey("GroupName")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("API.Entities.Follow", b =>
@@ -150,6 +228,25 @@ namespace API.Data.Migrations
                     b.Navigation("LikesUser");
                 });
 
+            modelBuilder.Entity("API.Entities.Message", b =>
+                {
+                    b.HasOne("API.Entities.AppUser", "RecipientAppUser")
+                        .WithMany("MessagesRecieved")
+                        .HasForeignKey("RecipientUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("API.Entities.AppUser", "SenderAppUser")
+                        .WithMany("MessagesSent")
+                        .HasForeignKey("SenderUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RecipientAppUser");
+
+                    b.Navigation("SenderAppUser");
+                });
+
             modelBuilder.Entity("API.Entities.AppPost", b =>
                 {
                     b.Navigation("LikedByUsers");
@@ -163,7 +260,16 @@ namespace API.Data.Migrations
 
                     b.Navigation("LikedPosts");
 
+                    b.Navigation("MessagesRecieved");
+
+                    b.Navigation("MessagesSent");
+
                     b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("API.Entities.Group", b =>
+                {
+                    b.Navigation("Connections");
                 });
 #pragma warning restore 612, 618
         }
